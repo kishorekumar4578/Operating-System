@@ -1,0 +1,452 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void fcfs(int req[], int n, int head)
+{
+    int i, total = 0;
+
+    printf("\nFCFS\n");
+    printf("Seek Sequence: %d", head);
+
+    for (i = 0; i < n; i++)
+    {
+        total += abs(head - req[i]);
+        head = req[i];
+        printf(" -> %d", head);
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+
+void sstf(int req[], int n, int head)
+{
+    int visited[20] = {0};
+    int i, j, total = 0;
+    int min, index, distance;
+
+    printf("\nSSTF\n");
+    printf("Seek Sequence: %d", head);
+
+    for (i = 0; i < n; i++)
+    {
+        min = 9999;
+        index = -1;
+
+        for (j = 0; j < n; j++)
+        {
+            if (!visited[j])
+            {
+                distance = abs(head - req[j]);
+
+                if (distance < min)
+                {
+                    min = distance;
+                    index = j;
+                }
+            }
+        }
+
+        visited[index] = 1;
+        total += min;
+        head = req[index];
+
+        printf(" -> %d", head);
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+
+void scan(int req[], int n, int head, int diskSize, int direction)
+{
+    int arr[22];
+    int i, j, temp;
+    int total = 0;
+
+    for (i = 0; i < n; i++)
+        arr[i] = req[i];
+
+    arr[n] = 0;
+    arr[n + 1] = diskSize - 1;
+
+    for (i = 0; i < n + 2; i++)
+    {
+        for (j = i + 1; j < n + 2; j++)
+        {
+            if (arr[i] > arr[j])
+            {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+
+    printf("\nSCAN\n");
+    printf("Seek Sequence: %d", head);
+
+    if (direction == 1)
+    {
+        for (i = 0; i < n + 2; i++)
+        {
+            if (arr[i] >= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        for (i = n; i >= 0; i--)
+        {
+            if (arr[i] < head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+    else
+    {
+        for (i = n + 1; i >= 0; i--)
+        {
+            if (arr[i] <= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        for (i = 1; i < n + 2; i++)
+        {
+            if (arr[i] > head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+
+void cscan(int req[], int n, int head, int diskSize, int direction)
+{
+    int arr[22];
+    int i, j, temp;
+    int total = 0;
+
+    for (i = 0; i < n; i++)
+        arr[i] = req[i];
+
+    arr[n] = 0;
+    arr[n + 1] = diskSize - 1;
+
+    for (i = 0; i < n + 2; i++)
+    {
+        for (j = i + 1; j < n + 2; j++)
+        {
+            if (arr[i] > arr[j])
+            {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+
+    printf("\nC-SCAN\n");
+    printf("Seek Sequence: %d", head);
+
+    if (direction == 1)
+    {
+        for (i = 0; i < n + 2; i++)
+        {
+            if (arr[i] >= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        if (head != diskSize - 1)
+        {
+            total += diskSize - 1 - head;
+            head = diskSize - 1;
+            printf(" -> %d", head);
+        }
+
+        total += diskSize - 1;
+        head = 0;
+        printf(" -> %d", head);
+
+        for (i = 0; i < n + 2; i++)
+        {
+            if (arr[i] < head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+    else
+    {
+        for (i = n + 1; i >= 0; i--)
+        {
+            if (arr[i] <= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        if (head != 0)
+        {
+            total += head;
+            head = 0;
+            printf(" -> %d", head);
+        }
+
+        total += diskSize - 1;
+        head = diskSize - 1;
+        printf(" -> %d", head);
+
+        for (i = n + 1; i >= 0; i--)
+        {
+            if (arr[i] > head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+
+void look(int req[], int n, int head, int direction)
+{
+    int arr[20];
+    int i, j, temp;
+    int total = 0;
+
+    for (i = 0; i < n; i++)
+        arr[i] = req[i];
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = i + 1; j < n; j++)
+        {
+            if (arr[i] > arr[j])
+            {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+
+    printf("\nLOOK\n");
+    printf("Seek Sequence: %d", head);
+
+    if (direction == 1)
+    {
+        for (i = 0; i < n; i++)
+        {
+            if (arr[i] >= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        for (i = n - 1; i >= 0; i--)
+        {
+            if (arr[i] < head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+    else
+    {
+        for (i = n - 1; i >= 0; i--)
+        {
+            if (arr[i] <= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        for (i = 0; i < n; i++)
+        {
+            if (arr[i] > head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+
+void clook(int req[], int n, int head, int direction)
+{
+    int arr[20];
+    int i, j, temp;
+    int total = 0;
+
+    for (i = 0; i < n; i++)
+        arr[i] = req[i];
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = i + 1; j < n; j++)
+        {
+            if (arr[i] > arr[j])
+            {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+
+    printf("\nC-LOOK\n");
+    printf("Seek Sequence: %d", head);
+
+    if (direction == 1)
+    {
+        for (i = 0; i < n; i++)
+        {
+            if (arr[i] >= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        for (i = 0; i < n; i++)
+        {
+            if (arr[i] < head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+    else
+    {
+        for (i = n - 1; i >= 0; i--)
+        {
+            if (arr[i] <= head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+
+        for (i = n - 1; i >= 0; i--)
+        {
+            if (arr[i] > head)
+            {
+                total += abs(head - arr[i]);
+                head = arr[i];
+                printf(" -> %d", head);
+            }
+        }
+    }
+
+    printf("\nTotal Head Movement = %d\n", total);
+}
+
+
+int main()
+{
+    int req[20], n;
+    int head, diskSize, direction;
+    int choice;
+    int i;
+
+    printf("Enter number of requests: ");
+    scanf("%d", &n);
+
+    printf("Enter request queue:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &req[i]);
+
+    printf("Enter initial head position: ");
+    scanf("%d", &head);
+
+    printf("Enter disk size: ");
+    scanf("%d", &diskSize);
+
+    printf("\n1. FCFS");
+    printf("\n2. SSTF");
+    printf("\n3. SCAN");
+    printf("\n4. C-SCAN");
+    printf("\n5. LOOK");
+    printf("\n6. C-LOOK");
+
+    printf("\n\nEnter your choice: ");
+    scanf("%d", &choice);
+
+    if (choice >= 3 && choice <= 6)
+    {
+        printf("Enter direction (1 = Right, 0 = Left): ");
+        scanf("%d", &direction);
+    }
+
+    switch (choice)
+    {
+        case 1:
+            fcfs(req, n, head);
+            break;
+
+        case 2:
+            sstf(req, n, head);
+            break;
+
+        case 3:
+            scan(req, n, head, diskSize, direction);
+            break;
+
+        case 4:
+            cscan(req, n, head, diskSize, direction);
+            break;
+
+        case 5:
+            look(req, n, head, direction);
+            break;
+
+        case 6:
+            clook(req, n, head, direction);
+            break;
+
+        default:
+            printf("Invalid choice\n");
+    }
+
+    return 0;
+}
