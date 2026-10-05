@@ -1,0 +1,185 @@
+[24bcs046@mepcolinux ex1]$cat q11.c
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h> 
+#include <sys/wait.h>
+
+int main(){
+   printf("p1id: %d\t p1 parentid:%d \n", getpid(),getppid()); 
+   
+   int p2;
+   p2 = fork();
+   if (p2 == 0){
+      printf("p2id:%d\t p2parentid:%d\n", getpid(), getppid());
+      int p4;
+      p4 = fork();
+      if (p4 == 0){
+         printf("p4id:%d\t p4parentid:%d\n", getpid(), getppid());
+         exit(0);
+      }
+      wait(NULL);
+      exit(0);
+   }
+   
+   int p3;
+   p3 = fork();
+   if(p3 == 0){
+      printf("p3 id:%d\t p3parentid:%d\n", getpid(), getppid());
+      int p5;
+      p5 = fork();
+      if(p5 == 0){
+         printf("p5id:%d\t p5parentid:%d\n", getpid(), getppid()); 
+         exit(0); 
+      }
+      wait(NULL); 
+      exit(0);    
+   }
+   
+   wait(NULL); 
+   wait(NULL); 
+   printf("p1 done %d\n", getpid()); 
+   return 0;
+}
+
+[24bcs046@mepcolinux ex1]$cc q11.c
+[24bcs046@mepcolinux ex1]$./q11
+p1id: 21287	 p1 parentid:20661 
+p2id:21288	 p2parentid:21287
+p3 id:21289	 p3parentid:21287
+p4id:21290	 p4parentid:21288
+p5id:21291	 p5parentid:21289
+p1 done 21287
+[24bcs046@mepcolinux ex1]$cat median.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+void medi(int n, int arr[]) {
+   int i, j;
+   for (i = 0; i < n - 1; i++) {
+      for (j = 0; j < n - i - 1; j++) { 
+         if (arr[j] > arr[j + 1]) {
+            int t = arr[j];
+            arr[j] = arr[j + 1];
+            arr[j + 1] = t;
+         }
+      }
+   }
+   float median; 
+   if (n % 2 == 0) {
+      median = (arr[n / 2 - 1] + arr[n / 2]) / 2.0;
+   }
+   else {
+      median = arr[n / 2];
+   }
+   printf("Median : %.2f\n", median);
+}
+
+int main() {
+   int n, i;
+   printf("Enter the value of n : ");
+   if (scanf("%d", &n) != 1 || n <= 0) {
+      return 1;
+   }
+   int arr[n];
+   printf("Enter %d elements:\n", n);
+   for(i = 0; i < n; i++) {
+      scanf("%d", &arr[i]);
+   }
+   pid_t p2 = fork();
+   if (p2 < 0) {
+      perror("Fork failed");
+      return 1;
+   }
+   else if (p2 == 0) {
+      printf("Child Processing complete.\n");
+   }
+   else {
+      wait(NULL);
+      printf("Parent Calculating median:\n");
+      medi(n, arr);
+   }
+   
+   return 0;
+}
+
+[24bcs046@mepcolinux ex1]$cc median.c
+[24bcs046@mepcolinux ex1]$./median
+Enter the value of n : 3
+Enter 3 elements:
+2
+4
+5
+Child Processing complete.
+Parent Calculating median:
+Median : 4.00
+[24bcs046@mepcolinux ex1]$./median
+Enter the value of n : 6
+Enter 6 elements:
+3
+4
+6
+7
+8
+2
+Child Processing complete.
+Parent Calculating median:
+Median : 5.00
+[24bcs046@mepcolinux ex1]$cat prime.c
+#include<stdio.h>
+#include<unistd.h>
+void printprime(int n) {
+   printf("p2 First %d prime numbers:\t",n);
+   int count =0,num=2;
+   while (count<n) {
+      int i,isPrime =1;
+      for (i=2;i*i<=num;i++) {
+	 if(num%i==0) {
+	    isPrime =0;
+	    break;}
+      }
+      if (isPrime) {
+	 printf("%d\t",num);
+	 count++;
+      }
+      num++;
+   }
+   printf("\n");
+}
+void printfibo (int n) {
+   printf("P3 First %d Fibonacci Numbers:\t",n);
+   long a=0,b=1;
+   int i;
+   for (i=0;i<n;i++) {
+      printf("%d\t",a);
+      long next = a+b;
+      a=b;
+      b=next;
+   }
+   printf("\n");
+}
+void main() {
+   int p2,n;
+   printf("Enter n value:");
+   scanf("%d",&n);
+   p2 = fork();
+   if(p2==0)
+      printprime(n);
+   else {
+      int p3;
+      p3 = fork();
+      if (p3==0)
+	 printfibo(n);
+   }
+}
+
+[24bcs046@mepcolinux ex1]$cc prime.c
+[24bcs046@mepcolinux ex1]$./prime.out
+Enter n value:8
+p2 First 8 prime numbers:	2	3	5	7	11	13	17	19	
+P3 First 8 Fibonacci Numbers:	0	1	1	2	3	5	8	13	
+[24bcs046@mepcolinux ex1]$exit
+exit
+
+Script done on Monday 13 July 2026 11:33:49 AM IST
